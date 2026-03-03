@@ -41,15 +41,69 @@ export interface LayerBase {
   updatedAt: number
 }
 
+// ─── Vector Layer Shared Types ────────────────────────────────────────────────
+
+export interface DefaultVectorRenderer {
+  kind: 'default'
+}
+
+export interface HeatmapVectorRenderer {
+  kind: 'heatmap'
+  /** Feature property (0–1) used as heat weight. Omit to weight all features equally. */
+  weightProperty?: string
+  /** Blur size in pixels. Default: 15 */
+  blur?: number
+  /** Radius in pixels. Default: 8 */
+  radius?: number
+  /** CSS color stops, e.g. ['blue', 'yellow', 'red']. Uses OL default if omitted. */
+  gradient?: string[]
+}
+
+export interface ClusterVectorRenderer {
+  kind: 'cluster'
+  /** Pixel distance within which features are clustered. Default: 40 */
+  distance?: number
+  /** Minimum pixel distance between cluster centers. Default: 0 */
+  minDistance?: number
+}
+
+export type VectorRendererConfig =
+  | DefaultVectorRenderer
+  | HeatmapVectorRenderer
+  | ClusterVectorRenderer
+
+export interface LabelConfig {
+  /** Feature property key whose value is rendered as the label text. */
+  property: string
+  font?: string
+  color?: string
+  haloColor?: string
+  haloWidth?: number
+  offsetX?: number
+  offsetY?: number
+  placement?: 'point' | 'line'
+  overflow?: boolean
+  showBackground?: boolean
+}
+
+export interface VectorLayerBase extends LayerBase {
+  style?: LayerStyleDefinition
+  /** Controls how features are rendered. Defaults to 'default' (per-feature styling). */
+  vectorRenderer?: VectorRendererConfig
+  /** When set, renders a text label on each feature using the specified property. */
+  labelConfig?: LabelConfig
+}
+
+// ─── Concrete Layer Types ─────────────────────────────────────────────────────
+
 export interface WmsLayer extends LayerBase {
   kind: 'wms'
   source: WmsSourceConfig
 }
 
-export interface WfsLayer extends LayerBase {
+export interface WfsLayer extends VectorLayerBase {
   kind: 'wfs'
   source: WfsSourceConfig
-  style?: LayerStyleDefinition
 }
 
 export interface ArcGisMapServerLayer extends LayerBase {
@@ -57,16 +111,19 @@ export interface ArcGisMapServerLayer extends LayerBase {
   source: ArcGisMapServerSourceConfig
 }
 
-export interface ArcGisFeatureServerLayer extends LayerBase {
+export interface ArcGisFeatureServerLayer extends VectorLayerBase {
   kind: 'arcgis-featureserver'
   source: ArcGisFeatureServerSourceConfig
-  style?: LayerStyleDefinition
+  /**
+   * Field list populated from the ArcGIS service spec (ArcGisLayerInfo.fields).
+   * Used by the UI to offer a label field picker — not consumed by the renderer.
+   */
+  availableLabelFields?: Array<{ name: string; alias: string }>
 }
 
-export interface GeoJsonLayer extends LayerBase {
+export interface GeoJsonLayer extends VectorLayerBase {
   kind: 'geojson'
   source: GeoJsonSourceConfig
-  style?: LayerStyleDefinition
 }
 
 export interface XyzTileLayer extends LayerBase {

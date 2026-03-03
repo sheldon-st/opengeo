@@ -395,6 +395,29 @@ export class MapEngine {
         coordinate: coord,
         pixel: evt.pixel as [number, number],
       })
+
+      const pickedFeatures: Array<{
+        properties: Record<string, unknown>
+        layerName?: string
+        layerId?: string
+      }> = []
+
+      this.olMap?.forEachFeatureAtPixel(
+        evt.pixel,
+        (feature, layer) => {
+          const { geometry: _geom, ...properties } = feature.getProperties() as Record<string, unknown>
+          const layerId = (layer as OlBaseLayer | null)?.get('domainLayerId') as string | undefined
+          const layerName = layerId ? this.store.getState().layers[layerId]?.name : undefined
+          pickedFeatures.push({ properties, layerName, layerId })
+        },
+        { hitTolerance: 4 },
+      )
+
+      this.events.emit('feature:picked', {
+        features: pickedFeatures,
+        pixel: evt.pixel as [number, number],
+        coordinate: coord,
+      })
     })
 
     this.olMap?.on('dblclick', (evt) => {

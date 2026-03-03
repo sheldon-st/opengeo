@@ -1,4 +1,5 @@
 import { LayerPanel } from './layer-tree/layer-panel'
+import { FeaturePopup } from './feature-detail/feature-popup'
 import {
   ResizableHandle,
   ResizablePanel,
@@ -13,8 +14,11 @@ export function MapLayout() {
         <LayerPanel />
       </ResizablePanel>
       <ResizableHandle withHandle />
-      <ResizablePanel  className='h-full p-2 flex'>
-        <MapViewport  className='rounded-md overflow-hidden' />
+      <ResizablePanel className='h-full p-2 flex' defaultSize={'75%'}>
+        <div className='relative flex-1 rounded-md overflow-hidden'>
+          <MapViewport />
+          <FeaturePopup />
+        </div>
       </ResizablePanel>
     </ResizablePanelGroup>
   )
