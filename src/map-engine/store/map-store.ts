@@ -79,16 +79,25 @@ export function createMapStore(initialView?: Partial<MapViewState>) {
       },
 
       removeLayer: (id) => {
+        // Collect all descendants before mutating state
+        const allLayers = get().layers
+        const toRemove = new Set<string>([id])
+        let changed = true
+        while (changed) {
+          changed = false
+          for (const layer of Object.values(allLayers)) {
+            if (layer.parentId != null && toRemove.has(layer.parentId) && !toRemove.has(layer.id)) {
+              toRemove.add(layer.id)
+              changed = true
+            }
+          }
+        }
         set((s) => {
-          const { [id]: _removed, ...rest } = s.layers
-          const childIds = Object.values(rest)
-            .filter((l) => l.parentId === id)
-            .map((l) => l.id)
-          const withoutChildren = { ...rest }
-          for (const cid of childIds) delete withoutChildren[cid]
-          return { layers: withoutChildren }
+          const newLayers = { ...s.layers }
+          for (const cid of toRemove) delete newLayers[cid]
+          return { layers: newLayers }
         })
-        persistence.removePersistedLayer(id)
+        for (const cid of toRemove) persistence.removePersistedLayer(cid)
       },
 
       setLayerVisibility: (id, visible) => {
