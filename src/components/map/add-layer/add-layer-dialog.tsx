@@ -1,5 +1,10 @@
 import { useState } from 'react'
 import { SourceFields } from '../layer-detail/source-fields'
+import {
+  ArcGisFeatureServerWizard
+  
+} from './arcgis-featureserver-wizard'
+import type {WizardCompletePayload} from './arcgis-featureserver-wizard';
 import type { GroupLayer, LayerKind } from '@/map-engine/types/layer.types'
 import {
   Dialog,
@@ -114,6 +119,37 @@ export function AddLayerDialog({ open, onOpenChange }: AddLayerDialogProps) {
     if (!newKind) return
     setKind(newKind)
     setSource(getDefaultSource(newKind) ?? {})
+    setName('')
+  }
+
+  const handleWizardComplete = (payload: WizardCompletePayload) => {
+    const groupId = engine.addLayer({
+      name: payload.groupName,
+      kind: 'group',
+      visible: true,
+      opacity: 1,
+      zIndex: 0,
+      parentId: null,
+      metadata: { arcgisServiceUrl: payload.serviceUrl },
+      expanded: true,
+    } as Omit<GroupLayer, 'id' | 'createdAt' | 'updatedAt' | 'sortOrder'>)
+
+    for (const layer of payload.layers) {
+      engine.addLayer({
+        name: layer.name,
+        kind: 'arcgis-featureserver',
+        visible: true,
+        opacity: 1,
+        zIndex: 0,
+        parentId: groupId,
+        metadata: layer.metadata,
+        source: layer.source,
+      } as Parameters<typeof engine.addLayer>[0])
+    }
+
+    onOpenChange(false)
+    setKind('xyz-tile')
+    setSource(getDefaultSource('xyz-tile') ?? {})
   }
 
   const handleCreate = () => {
@@ -149,9 +185,9 @@ export function AddLayerDialog({ open, onOpenChange }: AddLayerDialogProps) {
     setSource(getDefaultSource('xyz-tile') ?? {})
   }
 
-  // Build a fake layer for SourceFields preview
+  // Build a fake layer for SourceFields preview (not used for arcgis-featureserver)
   const previewLayer =
-    kind !== 'group'
+    kind !== 'group' && kind !== 'arcgis-featureserver'
       ? ({
           id: '__preview',
           kind,
@@ -208,30 +244,36 @@ export function AddLayerDialog({ open, onOpenChange }: AddLayerDialogProps) {
               </Select>
             </div>
 
-            <div className="grid gap-1">
-              <label className="text-[11px] font-medium text-muted-foreground">
-                Name
-              </label>
-              <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder={`New ${kind} layer`}
-              />
-            </div>
-
-            {previewLayer && (
+            {kind === 'arcgis-featureserver' ? (
+              <ArcGisFeatureServerWizard onComplete={handleWizardComplete} />
+            ) : (
               <>
-                <div className="text-[11px] font-medium text-muted-foreground">
-                  Source Configuration
+                <div className="grid gap-1">
+                  <label className="text-[11px] font-medium text-muted-foreground">
+                    Name
+                  </label>
+                  <Input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder={`New ${kind} layer`}
+                  />
                 </div>
-                <SourceFields
-                  layer={previewLayer as never}
-                  onChange={(patch) => {
-                    if (patch.source) {
-                      setSource(patch.source as Record<string, unknown>)
-                    }
-                  }}
-                />
+
+                {previewLayer && (
+                  <>
+                    <div className="text-[11px] font-medium text-muted-foreground">
+                      Source Configuration
+                    </div>
+                    <SourceFields
+                      layer={previewLayer as never}
+                      onChange={(patch) => {
+                        if (patch.source) {
+                          setSource(patch.source as Record<string, unknown>)
+                        }
+                      }}
+                    />
+                  </>
+                )}
               </>
             )}
           </div>
@@ -241,7 +283,9 @@ export function AddLayerDialog({ open, onOpenChange }: AddLayerDialogProps) {
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleCreate}>Create Layer</Button>
+          {kind !== 'arcgis-featureserver' && (
+            <Button onClick={handleCreate}>Create Layer</Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

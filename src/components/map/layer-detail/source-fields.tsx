@@ -1,6 +1,13 @@
 import type { LayerDefinition } from '@/map-engine'
+import type { ArcGisField } from '@/lib/arcgis-rest'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
+import { Checkbox } from '@/components/ui/checkbox'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import {
+  FIELD_TYPE_SHORT,
+  isConfigurableField,
+} from '@/components/map/add-layer/arcgis-featureserver-wizard'
 
 interface SourceFieldsProps {
   layer: LayerDefinition
@@ -152,6 +159,25 @@ export function SourceFields({ layer, onChange }: SourceFieldsProps) {
 
     case 'arcgis-featureserver': {
       const s = layer.source
+      const arcgisFields = layer.metadata?.arcgisFields as
+        | Array<ArcGisField>
+        | undefined
+      const configurableFields = arcgisFields?.filter(isConfigurableField)
+      const currentOutFields = new Set(
+        s.outFields?.includes('*') || !s.outFields?.length
+          ? (configurableFields?.map((f) => f.name) ?? [])
+          : s.outFields,
+      )
+
+      const toggleField = (name: string) => {
+        const next = new Set(currentOutFields)
+        if (next.has(name)) next.delete(name)
+        else next.add(name)
+        const allSelected =
+          configurableFields?.every((f) => next.has(f.name)) ?? false
+        update('outFields', allSelected ? ['*'] : Array.from(next))
+      }
+
       return (
         <div className="grid gap-3">
           <Field label="URL">
@@ -164,19 +190,50 @@ export function SourceFields({ layer, onChange }: SourceFieldsProps) {
             <Input
               defaultValue={s.where ?? '1=1'}
               onBlur={(e) => update('where', e.target.value)}
+              className="font-mono text-xs"
             />
           </Field>
-          <Field label="Out Fields (comma-separated)">
-            <Input
-              defaultValue={s.outFields?.join(',') ?? '*'}
-              onBlur={(e) =>
-                update(
-                  'outFields',
-                  e.target.value.split(',').map((v) => v.trim()),
-                )
-              }
-            />
-          </Field>
+          {configurableFields?.length ? (
+            <Field
+              label={`Fields (${currentOutFields.size}/${configurableFields.length} selected)`}
+            >
+              <ScrollArea className="max-h-44 rounded-md border border-input bg-input/10 p-2">
+                <div className="grid gap-1.5">
+                  {configurableFields.map((field) => (
+                    <label
+                      key={field.name}
+                      className="flex cursor-pointer items-center gap-2 rounded px-1 py-0.5 text-xs hover:bg-muted/50"
+                    >
+                      <Checkbox
+                        checked={currentOutFields.has(field.name)}
+                        onCheckedChange={() => toggleField(field.name)}
+                      />
+                      <span className="min-w-0 flex-1 truncate font-medium">
+                        {field.alias && field.alias !== field.name
+                          ? field.alias
+                          : field.name}
+                      </span>
+                      <span className="shrink-0 text-[10px] text-muted-foreground">
+                        {FIELD_TYPE_SHORT[field.type] ?? field.type}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </ScrollArea>
+            </Field>
+          ) : (
+            <Field label="Out Fields (comma-separated)">
+              <Input
+                defaultValue={s.outFields?.join(',') ?? '*'}
+                onBlur={(e) =>
+                  update(
+                    'outFields',
+                    e.target.value.split(',').map((v) => v.trim()),
+                  )
+                }
+              />
+            </Field>
+          )}
           <Field label="Token">
             <Input
               defaultValue={s.token ?? ''}

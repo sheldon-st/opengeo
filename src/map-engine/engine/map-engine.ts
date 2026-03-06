@@ -1,13 +1,14 @@
 import OlMap from 'ol/Map'
 import OlView from 'ol/View'
 import { fromLonLat, toLonLat } from 'ol/proj'
+import LayerGroup from 'ol/layer/Group'
 import { LayerRegistry } from '../registry/layer-registry'
 import { FeatureRegistry } from '../registry/feature-registry'
 import { registerBuiltinRenderers } from '../renderers'
-import {  createMapStore } from '../store/map-store'
+import { createMapStore } from '../store/map-store'
 import { generateId } from '../utils/id'
 import { EventBus } from './event-bus'
-import type {MapStore} from '../store/map-store';
+import type { MapStore } from '../store/map-store'
 import type {
   MapEngineEventMap,
   MapEngineEventName,
@@ -297,11 +298,12 @@ export class MapEngine {
     const currentIds = new Set(Object.keys(layers))
     const prevIds = new Set(Object.keys(prevLayers))
 
-    // Added
-    for (const id of currentIds) {
-      if (!prevIds.has(id)) {
-        this.createOlLayer(layers[id])
-      }
+    // Added — sort topologically so groups are created before their children
+    const added = [...currentIds]
+      .filter((id) => !prevIds.has(id))
+      .map((id) => layers[id])
+    for (const layer of this.topologicalSort(added)) {
+      this.createOlLayer(layer)
     }
 
     // Removed
@@ -319,12 +321,45 @@ export class MapEngine {
     }
   }
 
+  /** Sort layers so every parent appears before its children. */
+  private topologicalSort(
+    layers: Array<LayerDefinition>,
+  ): Array<LayerDefinition> {
+    const byId = new Map(layers.map((l) => [l.id, l]))
+    const sorted: Array<LayerDefinition> = []
+    const visited = new Set<string>()
+
+    const visit = (layer: LayerDefinition): void => {
+      if (visited.has(layer.id)) return
+      if (layer.parentId != null) {
+        const parent = byId.get(layer.parentId)
+        if (parent) visit(parent)
+      }
+      visited.add(layer.id)
+      sorted.push(layer)
+    }
+
+    for (const layer of layers) visit(layer)
+    return sorted
+  }
+
   private createOlLayer(layer: LayerDefinition): void {
     if (!this.layerRegistry.canHandle(layer)) return
     const entry = this.layerRegistry.resolve(layer)
     const olLayer = entry.renderer.create(layer, this)
     olLayer.set('domainLayerId', layer.id)
+    if (layer.parentId != null) {
+      olLayer.set('domainParentId', layer.parentId)
+    }
     this.olLayerCache.set(layer.id, olLayer)
+
+    if (layer.parentId != null) {
+      const parentOlLayer = this.olLayerCache.get(layer.parentId)
+      if (parentOlLayer instanceof LayerGroup) {
+        parentOlLayer.getLayers().push(olLayer)
+        return
+      }
+    }
     this.olMap?.addLayer(olLayer)
   }
 
@@ -335,6 +370,14 @@ export class MapEngine {
       return
     }
     if (!this.layerRegistry.canHandle(next)) return
+
+    // If the layer moved to a different parent, recreate in the correct container
+    if (prev.parentId !== next.parentId) {
+      this.removeOlLayer(next.id)
+      this.createOlLayer(next)
+      return
+    }
+
     const entry = this.layerRegistry.resolve(next)
     const handled = entry.renderer.update(olLayer, prev, next, this)
     if (!handled) {
@@ -346,8 +389,17 @@ export class MapEngine {
   private removeOlLayer(id: string): void {
     const olLayer = this.olLayerCache.get(id)
     if (!olLayer) return
-    this.olMap?.removeLayer(olLayer)
     this.olLayerCache.delete(id)
+
+    const parentId = olLayer.get('domainParentId') as string | undefined
+    if (parentId) {
+      const parentOlLayer = this.olLayerCache.get(parentId)
+      if (parentOlLayer instanceof LayerGroup) {
+        parentOlLayer.getLayers().remove(olLayer)
+        return
+      }
+    }
+    this.olMap?.removeLayer(olLayer)
   }
 
   private syncBaseLayerToOl(layer: LayerDefinition | null): void {
@@ -366,7 +418,7 @@ export class MapEngine {
 
   private syncAllLayersToOl(): void {
     const layers = this.store.getState().layers
-    for (const layer of Object.values(layers)) {
+    for (const layer of this.topologicalSort(Object.values(layers))) {
       this.createOlLayer(layer)
     }
   }
@@ -394,6 +446,34 @@ export class MapEngine {
       this.events.emit('map:click', {
         coordinate: coord,
         pixel: evt.pixel as [number, number],
+      })
+
+      const pickedFeatures: Array<{
+        properties: Record<string, unknown>
+        layerName?: string
+        layerId?: string
+      }> = []
+
+      this.olMap?.forEachFeatureAtPixel(
+        evt.pixel,
+        (feature, layer) => {
+          const { geometry: _geom, ...properties } =
+            feature.getProperties() as Record<string, unknown>
+          const layerId = (layer as OlBaseLayer | null)?.get(
+            'domainLayerId',
+          ) as string | undefined
+          const layerName = layerId
+            ? this.store.getState().layers[layerId]?.name
+            : undefined
+          pickedFeatures.push({ properties, layerName, layerId })
+        },
+        { hitTolerance: 4 },
+      )
+
+      this.events.emit('feature:picked', {
+        features: pickedFeatures,
+        pixel: evt.pixel as [number, number],
+        coordinate: coord,
       })
     })
 

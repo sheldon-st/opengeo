@@ -40,10 +40,7 @@ export { useMapEvent } from './hooks/use-map-event'
 export { useBaseLayer } from './hooks/use-base-layer'
 
 // Presets
-export {
-  BASE_LAYER_PRESETS,
-  getActivePresetId,
-} from './presets/base-layers'
+export { BASE_LAYER_PRESETS, getActivePresetId } from './presets/base-layers'
 export type { BaseLayerPreset, BaseLayerPresetId } from './presets/base-layers'
 
 // Utils

@@ -24,6 +24,16 @@ export interface MapEngineEventMap {
   'view:zoom-changed': { zoom: number }
   'view:center-changed': { center: [number, number] }
 
+  'feature:picked': {
+    features: Array<{
+      properties: Record<string, unknown>
+      layerName?: string
+      layerId?: string
+    }>
+    pixel: [number, number]
+    coordinate: [number, number]
+  }
+
   'map:click': { coordinate: [number, number]; pixel: [number, number] }
   'map:dblclick': { coordinate: [number, number]; pixel: [number, number] }
   'map:pointermove': { coordinate: [number, number]; pixel: [number, number] }

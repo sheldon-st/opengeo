@@ -82,7 +82,7 @@ export const wmsLayerRenderer: LayerRenderer = {
       (olLayer as ImageLayer<ImageWMS>).getSource?.() ??
       (olLayer as TileLayer<TileWMS>).getSource?.()
     if (olSource && 'updateParams' in olSource) {
-      ;(olSource).updateParams({
+      olSource.updateParams({
         LAYERS: next.source.layers,
         FORMAT: next.source.format ?? 'image/png',
         ...next.source.extraParams,

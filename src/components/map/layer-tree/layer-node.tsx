@@ -21,6 +21,16 @@ export function LayerNode({
   const layer = node.data.layer
   const isGroup = layer.kind === 'group'
 
+  let isAncestorHidden = false
+  let p = node.parent
+  while (p?.data?.layer) {
+    if (!p.data.layer.visible) {
+      isAncestorHidden = true
+      break
+    }
+    p = p.parent
+  }
+
   const handleToggleVisibility = (e: React.MouseEvent) => {
     e.stopPropagation()
     engine.updateLayer(layer.id, { visible: !layer.visible })
@@ -42,9 +52,10 @@ export function LayerNode({
           'group flex items-center gap-1 pr-1 pl-1 py-0.5 cursor-pointer rounded-sm text-sm',
           'hover:bg-accent/50',
           node.isSelected && 'bg-accent text-accent-foreground',
-          !layer.visible && 'opacity-60',
+          (!layer.visible || isAncestorHidden) && 'opacity-50',
         )}
         onClick={handleClick}
+        onDoubleClick={() => onShowProperties(layer.id)}
       >
         {/* Expand/collapse chevron for groups, spacer for leaves */}
         <span className="flex h-4 w-4 shrink-0 items-center justify-center">

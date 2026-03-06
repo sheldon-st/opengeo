@@ -2,15 +2,31 @@ import VectorLayer from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
 import GeoJSON from 'ol/format/GeoJSON'
 import { bbox as bboxStrategy } from 'ol/loadingstrategy'
-import { updateCommonLayerProps } from './common'
-import { convertLayerStyle } from './style-utils'
+import { compileToCql } from '../filter/compilers/cql'
+import {
+  buildVectorOlLayer,
+  disposeVectorOlLayer,
+  updateCommonLayerProps,
+} from './common'
+import { composeWithLabelConfig, convertLayerStyle } from './style-utils'
 import type OlBaseLayer from 'ol/layer/Base'
+import type OlStyle from 'ol/style/Style'
+import type { StyleFunction } from 'ol/style/Style'
 import type { LayerRenderer } from '../registry/types'
 import type { LayerDefinition, WfsLayer } from '../types/layer.types'
 import type { MapEngine } from '../engine/map-engine'
 
 function isWfsLayer(layer: LayerDefinition): layer is WfsLayer {
   return layer.kind === 'wfs'
+}
+
+function applyLayerStyle(olLayer: VectorLayer, layer: WfsLayer): void {
+  // HeatmapLayer renders using weight/gradient — vector styles don't apply
+  if (layer.vectorRenderer?.kind === 'heatmap') return
+
+  const baseStyle = layer.style ? convertLayerStyle(layer.style) : undefined
+  const style = composeWithLabelConfig(baseStyle, layer.labelConfig)
+  if (style) olLayer.setStyle(style)
 }
 
 export const wfsLayerPredicate = (layer: LayerDefinition): boolean =>
@@ -44,8 +60,12 @@ export const wfsLayerRenderer: LayerRenderer = {
             String(source.maxFeatures),
           )
         }
-        if (source.filter) {
-          params.set('CQL_FILTER', source.filter)
+        // Structured filter takes precedence over raw source.filter
+        const effectiveCql = layer.filter
+          ? compileToCql(layer.filter)
+          : source.filter
+        if (effectiveCql) {
+          params.set('CQL_FILTER', effectiveCql)
         }
 
         const url = `${source.url}?${params.toString()}`
@@ -62,22 +82,8 @@ export const wfsLayerRenderer: LayerRenderer = {
       },
     })
 
-    const olLayer = new VectorLayer({
-      visible: layer.visible,
-      opacity: layer.opacity,
-      zIndex: layer.zIndex,
-      minResolution: layer.minResolution,
-      maxResolution: layer.maxResolution,
-      minZoom: layer.minZoom,
-      maxZoom: layer.maxZoom,
-      source: vectorSource,
-      properties: { domainLayerId: layer.id },
-    })
-
-    if (layer.style) {
-      const olStyle = convertLayerStyle(layer.style)
-      olLayer.setStyle(Array.isArray(olStyle) ? olStyle : olStyle)
-    }
+    const olLayer = buildVectorOlLayer(vectorSource, layer)
+    if (olLayer instanceof VectorLayer) applyLayerStyle(olLayer, layer)
 
     return olLayer
   },
@@ -89,21 +95,33 @@ export const wfsLayerRenderer: LayerRenderer = {
   ): boolean {
     if (!isWfsLayer(prev) || !isWfsLayer(next)) return false
 
+    // Changing render mode requires a full recreate (different OL layer class)
+    if (
+      (prev.vectorRenderer?.kind ?? 'default') !==
+      (next.vectorRenderer?.kind ?? 'default')
+    ) {
+      return false
+    }
+
     updateCommonLayerProps(olLayer, next)
 
     if (
       prev.source.url !== next.source.url ||
       prev.source.typeName !== next.source.typeName ||
-      prev.source.filter !== next.source.filter
+      prev.source.filter !== next.source.filter ||
+      JSON.stringify(prev.filter) !== JSON.stringify(next.filter)
     ) {
       return false
+    }
+
+    if (prev.style !== next.style || prev.labelConfig !== next.labelConfig) {
+      applyLayerStyle(olLayer as VectorLayer, next)
     }
 
     return true
   },
 
   dispose(olLayer: OlBaseLayer): void {
-    const src = (olLayer as VectorLayer).getSource()
-    src?.dispose()
+    disposeVectorOlLayer(olLayer)
   },
 }

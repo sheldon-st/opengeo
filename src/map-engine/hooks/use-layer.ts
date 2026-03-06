@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 import { useMapEngine, useMapStore } from '../components/map-provider'
+import type { FilterExpression } from '../types/filter.types'
 import type { LayerDefinition } from '../types/layer.types'
 
 export function useLayer(id: string) {
@@ -18,5 +19,11 @@ export function useLayer(id: string) {
 
   const remove = useCallback(() => engine.removeLayer(id), [engine, id])
 
-  return { layer, setVisibility, setOpacity, remove }
+  const setFilter = useCallback(
+    (filter: FilterExpression | undefined) =>
+      engine.updateLayer(id, { filter }),
+    [engine, id],
+  )
+
+  return { layer, setVisibility, setOpacity, remove, setFilter }
 }

@@ -1,8 +1,5 @@
 import { useMapEngine, useMapStore } from '../components/map-provider'
-import {
-  BASE_LAYER_PRESETS,
-  getActivePresetId,
-} from '../presets/base-layers'
+import { BASE_LAYER_PRESETS, getActivePresetId } from '../presets/base-layers'
 import type { BaseLayerPresetId } from '../presets/base-layers'
 import type { LayerDefinition } from '../types/layer.types'
 
