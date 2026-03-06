@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { SourceFields } from '../layer-detail/source-fields'
 import {
   ArcGisFeatureServerWizard
-  
+
 } from './arcgis-featureserver-wizard'
 import type {WizardCompletePayload} from './arcgis-featureserver-wizard';
 import type { GroupLayer, LayerKind } from '@/map-engine/types/layer.types'
+import { detectSourceType } from './detect-source-type'
 import {
   Dialog,
   DialogContent,
@@ -114,13 +115,30 @@ export function AddLayerDialog({ open, onOpenChange }: AddLayerDialogProps) {
   const [source, setSource] = useState<Record<string, unknown>>(
     getDefaultSource('xyz-tile') ?? {},
   )
+  const [autoDetected, setAutoDetected] = useState<LayerKind | null>(null)
 
   const handleKindChange = (newKind: LayerKind | null) => {
     if (!newKind) return
     setKind(newKind)
+    setAutoDetected(null)
     setSource(getDefaultSource(newKind) ?? {})
     setName('')
   }
+
+  const handleUrlInput = useCallback(
+    (url: string) => {
+      const detected = detectSourceType(url)
+      if (detected && detected !== kind) {
+        setAutoDetected(detected)
+        setKind(detected)
+        const defaults = getDefaultSource(detected) ?? {}
+        setSource({ ...defaults, url })
+      } else {
+        setSource((prev) => ({ ...prev, url }))
+      }
+    },
+    [kind],
+  )
 
   const handleWizardComplete = (payload: WizardCompletePayload) => {
     const groupId = engine.addLayer({
@@ -150,6 +168,7 @@ export function AddLayerDialog({ open, onOpenChange }: AddLayerDialogProps) {
     onOpenChange(false)
     setKind('xyz-tile')
     setSource(getDefaultSource('xyz-tile') ?? {})
+    setAutoDetected(null)
   }
 
   const handleCreate = () => {
@@ -183,6 +202,7 @@ export function AddLayerDialog({ open, onOpenChange }: AddLayerDialogProps) {
     setName('')
     setKind('xyz-tile')
     setSource(getDefaultSource('xyz-tile') ?? {})
+    setAutoDetected(null)
   }
 
   // Build a fake layer for SourceFields preview (not used for arcgis-featureserver)
@@ -243,6 +263,29 @@ export function AddLayerDialog({ open, onOpenChange }: AddLayerDialogProps) {
                 </SelectContent>
               </Select>
             </div>
+
+            {kind !== 'group' && kind !== 'arcgis-featureserver' && (
+              <div className="grid gap-1">
+                <label className="text-[11px] font-medium text-muted-foreground">
+                  Source URL
+                </label>
+                <Input
+                  value={(source.url as string) ?? ''}
+                  onChange={(e) => handleUrlInput(e.target.value)}
+                  placeholder="Paste a URL to auto-detect layer type…"
+                />
+                {autoDetected && (
+                  <p className="text-[10px] text-muted-foreground">
+                    Auto-detected as{' '}
+                    <span className="font-semibold">
+                      {KIND_OPTIONS.flatMap((g) => g.items).find(
+                        (i) => i.value === autoDetected,
+                      )?.label ?? autoDetected}
+                    </span>
+                  </p>
+                )}
+              </div>
+            )}
 
             {kind === 'arcgis-featureserver' ? (
               <ArcGisFeatureServerWizard onComplete={handleWizardComplete} />

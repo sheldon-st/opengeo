@@ -13,6 +13,8 @@ spec:
       {{- include "opengeo.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      annotations:
+        deploy/revision: {{ .Release.Revision | quote }}
       labels:
         {{- include "opengeo.selectorLabels" . | nindent 8 }}
     spec:
