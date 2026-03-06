@@ -5,10 +5,10 @@ import LayerGroup from 'ol/layer/Group'
 import { LayerRegistry } from '../registry/layer-registry'
 import { FeatureRegistry } from '../registry/feature-registry'
 import { registerBuiltinRenderers } from '../renderers'
-import {  createMapStore } from '../store/map-store'
+import { createMapStore } from '../store/map-store'
 import { generateId } from '../utils/id'
 import { EventBus } from './event-bus'
-import type {MapStore} from '../store/map-store';
+import type { MapStore } from '../store/map-store'
 import type {
   MapEngineEventMap,
   MapEngineEventName,
@@ -457,9 +457,14 @@ export class MapEngine {
       this.olMap?.forEachFeatureAtPixel(
         evt.pixel,
         (feature, layer) => {
-          const { geometry: _geom, ...properties } = feature.getProperties() as Record<string, unknown>
-          const layerId = (layer as OlBaseLayer | null)?.get('domainLayerId') as string | undefined
-          const layerName = layerId ? this.store.getState().layers[layerId]?.name : undefined
+          const { geometry: _geom, ...properties } =
+            feature.getProperties() as Record<string, unknown>
+          const layerId = (layer as OlBaseLayer | null)?.get(
+            'domainLayerId',
+          ) as string | undefined
+          const layerName = layerId
+            ? this.store.getState().layers[layerId]?.name
+            : undefined
           pickedFeatures.push({ properties, layerName, layerId })
         },
         { hitTolerance: 4 },

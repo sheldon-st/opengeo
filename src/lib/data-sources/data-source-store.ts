@@ -1,9 +1,9 @@
 import { create } from 'zustand'
-import type { DataSource } from './types'
 import * as persistence from './persistence'
+import type { DataSource } from './types'
 
 interface DataSourceStoreState {
-  sources: DataSource[]
+  sources: Array<DataSource>
   isHydrated: boolean
   hydrate: () => Promise<void>
   add: (source: DataSource) => void

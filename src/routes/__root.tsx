@@ -35,7 +35,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className=' w-screen h-screen'>
+      <body className=" w-screen h-screen">
         {children}
         <TanStackDevtools
           config={{

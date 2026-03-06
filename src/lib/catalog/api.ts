@@ -1,4 +1,8 @@
-import type { CatalogSearchParams, CatalogSearchResponse, CatalogService } from './types'
+import type {
+  CatalogSearchParams,
+  CatalogSearchResponse,
+  CatalogService,
+} from './types'
 
 const API_BASE = import.meta.env.VITE_CATALOG_API_URL ?? 'http://localhost:3007'
 
@@ -14,8 +18,10 @@ export async function searchServices(
   if (params.health) qs.set('health', params.health)
   if (params.source_id) qs.set('source_id', params.source_id)
   if (params.organization) qs.set('organization', params.organization)
-  if (params.page != null && params.page > 0) qs.set('page', String(params.page))
-  if (params.limit != null && params.limit > 0) qs.set('limit', String(params.limit))
+  if (params.page != null && params.page > 0)
+    qs.set('page', String(params.page))
+  if (params.limit != null && params.limit > 0)
+    qs.set('limit', String(params.limit))
   if (params.sort) qs.set('sort', params.sort)
   if (params.order) qs.set('order', params.order)
   if (params.createdAfter) qs.set('createdAfter', params.createdAfter)

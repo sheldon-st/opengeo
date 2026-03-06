@@ -1,4 +1,3 @@
-
 import { wmsLayerPredicate, wmsLayerRenderer } from './wms.renderer'
 import { wfsLayerPredicate, wfsLayerRenderer } from './wfs.renderer'
 import {

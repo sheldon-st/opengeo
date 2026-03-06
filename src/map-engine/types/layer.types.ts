@@ -9,6 +9,7 @@ import type {
   WmtsSourceConfig,
   XyzTileSourceConfig,
 } from './source.types'
+import type { FilterExpression } from './filter.types'
 import type { LayerStyleDefinition } from './style.types'
 
 export type LayerKind =
@@ -35,6 +36,8 @@ export interface LayerBase {
   minZoom?: number
   maxZoom?: number
   metadata: Record<string, unknown>
+  /** Structured filter expression — compiled to WHERE/CQL by the renderer. */
+  filter?: FilterExpression
   parentId: string | null
   sortOrder: number
   createdAt: number
@@ -56,7 +59,7 @@ export interface HeatmapVectorRenderer {
   /** Radius in pixels. Default: 8 */
   radius?: number
   /** CSS color stops, e.g. ['blue', 'yellow', 'red']. Uses OL default if omitted. */
-  gradient?: string[]
+  gradient?: Array<string>
 }
 
 export interface ClusterVectorRenderer {

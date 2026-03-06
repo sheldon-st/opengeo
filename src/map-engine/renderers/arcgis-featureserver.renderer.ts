@@ -3,6 +3,7 @@ import VectorSource from 'ol/source/Vector'
 import EsriJSON from 'ol/format/EsriJSON'
 import { tile as tileStrategy } from 'ol/loadingstrategy'
 import { createXYZ } from 'ol/tilegrid'
+import { compileToArcGisWhere } from '../filter/compilers/arcgis'
 import {
   buildVectorOlLayer,
   disposeVectorOlLayer,
@@ -37,17 +38,15 @@ function applyLayerStyle(
   const drawingInfo = layer.metadata?.arcgisDrawingInfo as
     | ArcGisDrawingInfo
     | undefined
-  let baseStyle: OlStyle | OlStyle[] | StyleFunction | undefined
+  let baseStyle: OlStyle | Array<OlStyle> | StyleFunction | undefined
   if (drawingInfo) {
-    baseStyle = convertDrawingInfoToOLStyle(drawingInfo) as
-      | OlStyle
-      | StyleFunction
+    baseStyle = convertDrawingInfoToOLStyle(drawingInfo)
   } else if (layer.style) {
-    baseStyle = convertLayerStyle(layer.style) as OlStyle | OlStyle[]
+    baseStyle = convertLayerStyle(layer.style)
   }
 
   const style = composeWithLabelConfig(baseStyle, layer.labelConfig)
-  if (style) olLayer.setStyle(style as StyleFunction | OlStyle | OlStyle[])
+  if (style) olLayer.setStyle(style)
 }
 
 export const arcgisFeatureServerPredicate = (layer: LayerDefinition): boolean =>
@@ -81,7 +80,11 @@ export const arcgisFeatureServerRenderer: LayerRenderer = {
           outSR: '102100',
           outFields: source.outFields?.join(',') ?? '*',
         })
-        if (source.where) params.set('where', source.where)
+        // Structured filter takes precedence over raw source.where
+        const effectiveWhere = layer.filter
+          ? compileToArcGisWhere(layer.filter)
+          : source.where
+        if (effectiveWhere) params.set('where', effectiveWhere)
         if (source.token) params.set('token', source.token)
 
         const url = `${source.url}/query?${params.toString()}`
@@ -126,7 +129,8 @@ export const arcgisFeatureServerRenderer: LayerRenderer = {
     // Recreate if the data source changed
     if (
       prev.source.url !== next.source.url ||
-      prev.source.where !== next.source.where
+      prev.source.where !== next.source.where ||
+      JSON.stringify(prev.filter) !== JSON.stringify(next.filter)
     ) {
       return false
     }

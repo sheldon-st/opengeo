@@ -86,7 +86,11 @@ export function createMapStore(initialView?: Partial<MapViewState>) {
         while (changed) {
           changed = false
           for (const layer of Object.values(allLayers)) {
-            if (layer.parentId != null && toRemove.has(layer.parentId) && !toRemove.has(layer.id)) {
+            if (
+              layer.parentId != null &&
+              toRemove.has(layer.parentId) &&
+              !toRemove.has(layer.id)
+            ) {
               toRemove.add(layer.id)
               changed = true
             }

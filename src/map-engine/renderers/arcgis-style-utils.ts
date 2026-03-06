@@ -15,7 +15,7 @@ import type {
 // ─── Color conversion ─────────────────────────────────────────────────────────
 
 /** Convert ArcGIS [R, G, B, A] (A 0–255) to CSS rgba string */
-function toRgba(color: number[] | undefined): string {
+function toRgba(color: Array<number> | undefined): string {
   if (!color || color.length < 3) return 'rgba(0,0,0,1)'
   const [r, g, b, a = 255] = color
   return `rgba(${r},${g},${b},${(a / 255).toFixed(3)})`
@@ -23,7 +23,7 @@ function toRgba(color: number[] | undefined): string {
 
 // ─── Stroke helpers ───────────────────────────────────────────────────────────
 
-const LINE_DASH: Record<string, number[]> = {
+const LINE_DASH: Record<string, Array<number>> = {
   esriSLSDash: [8, 4],
   esriSLSDot: [2, 4],
   esriSLSDashDot: [8, 4, 2, 4],
@@ -56,7 +56,9 @@ export function convertSymbolToOLStyle(symbol: ArcGisSymbol): OlStyle {
   switch (symbol.type) {
     case 'esriSFS': {
       return new OlStyle({
-        fill: symbol.color ? new OlFill({ color: toRgba(symbol.color) }) : undefined,
+        fill: symbol.color
+          ? new OlFill({ color: toRgba(symbol.color) })
+          : undefined,
         stroke: symbol.outline?.color ? makeStroke(symbol.outline) : undefined,
       })
     }
@@ -72,22 +74,44 @@ export function convertSymbolToOLStyle(symbol: ArcGisSymbol): OlStyle {
     }
 
     case 'esriSMS': {
-      const fill = symbol.color ? new OlFill({ color: toRgba(symbol.color) }) : undefined
-      const stroke = symbol.outline?.color ? makeStroke(symbol.outline) : undefined
+      const fill = symbol.color
+        ? new OlFill({ color: toRgba(symbol.color) })
+        : undefined
+      const stroke = symbol.outline?.color
+        ? makeStroke(symbol.outline)
+        : undefined
       const radius = symbol.size ? symbol.size / 2 : 6
 
       switch (symbol.style) {
         case 'esriSMSSquare':
           return new OlStyle({
-            image: new OlRegularShape({ points: 4, radius, angle: Math.PI / 4, fill, stroke }),
+            image: new OlRegularShape({
+              points: 4,
+              radius,
+              angle: Math.PI / 4,
+              fill,
+              stroke,
+            }),
           })
         case 'esriSMSDiamond':
           return new OlStyle({
-            image: new OlRegularShape({ points: 4, radius, angle: 0, fill, stroke }),
+            image: new OlRegularShape({
+              points: 4,
+              radius,
+              angle: 0,
+              fill,
+              stroke,
+            }),
           })
         case 'esriSMSTriangle':
           return new OlStyle({
-            image: new OlRegularShape({ points: 3, radius, angle: 0, fill, stroke }),
+            image: new OlRegularShape({
+              points: 3,
+              radius,
+              angle: 0,
+              fill,
+              stroke,
+            }),
           })
         case 'esriSMSCross':
           return new OlStyle({
@@ -133,7 +157,9 @@ export function convertSymbolToOLStyle(symbol: ArcGisSymbol): OlStyle {
     case 'esriPFS': {
       // Picture fill — render outline only (full pattern support needs canvas)
       return new OlStyle({
-        fill: symbol.color ? new OlFill({ color: toRgba(symbol.color) }) : undefined,
+        fill: symbol.color
+          ? new OlFill({ color: toRgba(symbol.color) })
+          : undefined,
         stroke: symbol.outline?.color ? makeStroke(symbol.outline) : undefined,
       })
     }

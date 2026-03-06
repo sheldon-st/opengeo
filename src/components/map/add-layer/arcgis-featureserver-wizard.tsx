@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import { AlertCircleIcon, ChevronLeftIcon } from 'lucide-react'
+import {
+  ArcGisLayerSelector
+  
+} from './arcgis-layer-selector'
+import type { ArcGisFeatureServerSourceConfig } from '@/map-engine/types/source.types'
+import type {LayerSelectorCompletePayload} from './arcgis-layer-selector';
+import type {ArcGisField} from '@/lib/arcgis-rest';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
-import { normalizeFeatureServerUrl, type ArcGisField } from '@/lib/arcgis-rest'
-import type { ArcGisFeatureServerSourceConfig } from '@/map-engine/types/source.types'
-import {
-  ArcGisLayerSelector,
-  type LayerSelectorCompletePayload,
-} from './arcgis-layer-selector'
+import {  normalizeFeatureServerUrl } from '@/lib/arcgis-rest'
 
 export const FIELD_TYPE_SHORT: Record<string, string> = {
   esriFieldTypeOID: 'OID',
@@ -25,7 +27,9 @@ export const FIELD_TYPE_SHORT: Record<string, string> = {
 }
 
 export function isConfigurableField(field: ArcGisField): boolean {
-  return field.type !== 'esriFieldTypeGeometry' && field.type !== 'esriFieldTypeBlob'
+  return (
+    field.type !== 'esriFieldTypeGeometry' && field.type !== 'esriFieldTypeBlob'
+  )
 }
 
 export interface WizardLayerPayload {
@@ -38,7 +42,7 @@ export interface WizardLayerPayload {
 export interface WizardCompletePayload {
   groupName: string
   serviceUrl: string
-  layers: WizardLayerPayload[]
+  layers: Array<WizardLayerPayload>
 }
 
 interface ArcGisFeatureServerWizardProps {
@@ -93,7 +97,9 @@ export function ArcGisFeatureServerWizard({
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://services.arcgis.com/…/FeatureServer"
-            onKeyDown={(e) => e.key === 'Enter' && !connecting && handleConnect()}
+            onKeyDown={(e) =>
+              e.key === 'Enter' && !connecting && handleConnect()
+            }
           />
         </div>
         <div className="grid gap-1">

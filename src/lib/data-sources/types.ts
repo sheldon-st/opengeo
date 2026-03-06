@@ -24,7 +24,7 @@ export interface DirectoryFolder {
   kind: 'folder'
   name: string
   /** Path segments from root, e.g. ['Utilities', 'Geometry'] */
-  path: string[]
+  path: Array<string>
 }
 
 export interface DirectoryService {
@@ -41,6 +41,6 @@ export interface DirectoryService {
 export type DirectoryEntry = DirectoryFolder | DirectoryService
 
 export interface DirectoryListing {
-  folders: DirectoryFolder[]
-  services: DirectoryService[]
+  folders: Array<DirectoryFolder>
+  services: Array<DirectoryService>
 }

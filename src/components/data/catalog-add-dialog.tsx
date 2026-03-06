@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import type { GroupLayer } from '@/map-engine/types/layer.types'
+import type {LayerSelectorCompletePayload} from '@/components/map/add-layer/arcgis-layer-selector';
+import type {CatalogService} from '@/lib/catalog';
 import {
   Dialog,
   DialogContent,
@@ -12,17 +15,16 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useMapEngine } from '@/map-engine'
-import type { GroupLayer } from '@/map-engine/types/layer.types'
 import { SourceFields } from '@/components/map/layer-detail/source-fields'
 import {
-  ArcGisLayerSelector,
-  type LayerSelectorCompletePayload,
+  ArcGisLayerSelector
+  
 } from '@/components/map/add-layer/arcgis-layer-selector'
 import {
-  catalogTypeToLayerKind,
+  
   catalogServiceToSourceConfig,
-  getServiceTypeInfo,
-  type CatalogService,
+  catalogTypeToLayerKind,
+  getServiceTypeInfo
 } from '@/lib/catalog'
 
 interface CatalogAddDialogProps {
@@ -47,11 +49,7 @@ export function CatalogAddDialog({
   }
 
   return (
-    <GenericAddFlow
-      service={service}
-      open={open}
-      onOpenChange={onOpenChange}
-    />
+    <GenericAddFlow service={service} open={open} onOpenChange={onOpenChange} />
   )
 }
 
@@ -102,9 +100,7 @@ function FeatureServerFlow({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add Feature Service</DialogTitle>
-          <DialogDescription>
-            {service.title ?? service.url}
-          </DialogDescription>
+          <DialogDescription>{service.title ?? service.url}</DialogDescription>
         </DialogHeader>
         <ArcGisLayerSelector
           serviceUrl={service.url}
@@ -173,9 +169,7 @@ function GenericAddFlow({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add {typeInfo.label}</DialogTitle>
-          <DialogDescription>
-            {service.title ?? service.url}
-          </DialogDescription>
+          <DialogDescription>{service.title ?? service.url}</DialogDescription>
         </DialogHeader>
 
         <ScrollArea className="max-h-[60vh]">

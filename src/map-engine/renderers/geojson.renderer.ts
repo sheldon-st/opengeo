@@ -24,7 +24,7 @@ function applyLayerStyle(olLayer: VectorLayer, layer: GeoJsonLayer): void {
 
   const baseStyle = layer.style ? convertLayerStyle(layer.style) : undefined
   const style = composeWithLabelConfig(baseStyle, layer.labelConfig)
-  if (style) olLayer.setStyle(style as StyleFunction | OlStyle | OlStyle[])
+  if (style) olLayer.setStyle(style)
 }
 
 export const geojsonLayerPredicate = (layer: LayerDefinition): boolean =>

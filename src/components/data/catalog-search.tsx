@@ -6,6 +6,10 @@ import {
   SlidersHorizontalIcon,
   XIcon,
 } from 'lucide-react'
+import { CatalogServiceCard } from './catalog-service-card'
+import { CatalogServiceDetail } from './catalog-service-detail'
+import { CatalogAddDialog } from './catalog-add-dialog'
+import type {CatalogSearchMeta, CatalogSearchParams, CatalogService} from '@/lib/catalog';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -20,30 +24,27 @@ import {
 } from '@/components/ui/select'
 import {
   Combobox,
-  ComboboxInput,
-  ComboboxContent,
-  ComboboxList,
-  ComboboxItem,
-  ComboboxEmpty,
-  ComboboxChips,
   ComboboxChip,
+  ComboboxChips,
   ComboboxChipsInput,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
   useComboboxAnchor,
 } from '@/components/ui/combobox'
 import { cn } from '@/lib/utils'
 import {
-  searchServices,
-  getServiceTypes,
-  getOrganizations,
+  
+  
+  
   getKeywords,
+  getOrganizations,
   getServiceTypeInfo,
-  type CatalogService,
-  type CatalogSearchMeta,
-  type CatalogSearchParams,
+  getServiceTypes,
+  searchServices
 } from '@/lib/catalog'
-import { CatalogServiceCard } from './catalog-service-card'
-import { CatalogServiceDetail } from './catalog-service-detail'
-import { CatalogAddDialog } from './catalog-add-dialog'
 
 const PAGE_SIZE = 30
 
@@ -81,8 +82,9 @@ export function CatalogSearch() {
   const [meta, setMeta] = useState<CatalogSearchMeta | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [selectedService, setSelectedService] =
-    useState<CatalogService | null>(null)
+  const [selectedService, setSelectedService] = useState<CatalogService | null>(
+    null,
+  )
   const [addingService, setAddingService] = useState<CatalogService | null>(
     null,
   )
@@ -92,9 +94,15 @@ export function CatalogSearch() {
 
   // Fetch available service types, organizations, and keywords on mount
   useEffect(() => {
-    getServiceTypes().then(setAvailableTypes).catch(() => {})
-    getOrganizations().then(setAvailableOrgs).catch(() => {})
-    getKeywords().then(setAvailableKeywords).catch(() => {})
+    getServiceTypes()
+      .then(setAvailableTypes)
+      .catch(() => {})
+    getOrganizations()
+      .then(setAvailableOrgs)
+      .catch(() => {})
+    getKeywords()
+      .then(setAvailableKeywords)
+      .catch(() => {})
   }, [])
 
   // Debounce search query
@@ -122,7 +130,8 @@ export function CatalogSearch() {
     if (debouncedQuery) params.q = debouncedQuery
     if (selectedTypes.size > 0) params.type = [...selectedTypes].join(',')
     if (organization) params.organization = organization
-    if (selectedKeywords.length > 0) params.keywords = selectedKeywords.join(',')
+    if (selectedKeywords.length > 0)
+      params.keywords = selectedKeywords.join(',')
     if (healthFilter) params.health = healthFilter
     if (sort && sort !== 'relevance') {
       params.sort = sort as CatalogSearchParams['sort']
@@ -154,7 +163,16 @@ export function CatalogSearch() {
     return () => {
       cancelled = true
     }
-  }, [debouncedQuery, selectedTypes, organization, selectedKeywords, healthFilter, updatedWithin, sort, page])
+  }, [
+    debouncedQuery,
+    selectedTypes,
+    organization,
+    selectedKeywords,
+    healthFilter,
+    updatedWithin,
+    sort,
+    page,
+  ])
 
   const toggleType = (type: string) => {
     setSelectedTypes((prev) => {
@@ -391,12 +409,17 @@ export function CatalogSearch() {
                   setPage(1)
                 }}
               >
-                <ComboboxChips ref={keywordsAnchor} className="min-h-7 text-[11px]">
+                <ComboboxChips
+                  ref={keywordsAnchor}
+                  className="min-h-7 text-[11px]"
+                >
                   {selectedKeywords.map((k) => (
                     <ComboboxChip key={k}>{k}</ComboboxChip>
                   ))}
                   <ComboboxChipsInput
-                    placeholder={selectedKeywords.length === 0 ? 'Filter by keyword…' : ''}
+                    placeholder={
+                      selectedKeywords.length === 0 ? 'Filter by keyword…' : ''
+                    }
                   />
                 </ComboboxChips>
                 <ComboboxContent anchor={keywordsAnchor}>

@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { AlertCircleIcon } from 'lucide-react'
+import type { GroupLayer } from '@/map-engine/types/layer.types'
+import type { DataSource, DirectoryService } from '@/lib/data-sources'
+import type {LayerSelectorCompletePayload} from '@/components/map/add-layer/arcgis-layer-selector';
 import {
   Dialog,
   DialogContent,
@@ -13,11 +16,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import { useMapEngine } from '@/map-engine'
-import type { GroupLayer } from '@/map-engine/types/layer.types'
-import type { DataSource, DirectoryService } from '@/lib/data-sources'
 import {
-  ArcGisLayerSelector,
-  type LayerSelectorCompletePayload,
+  ArcGisLayerSelector
+  
 } from '@/components/map/add-layer/arcgis-layer-selector'
 
 interface AddServiceDialogProps {

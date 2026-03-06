@@ -94,7 +94,7 @@ function FeatureProperties({ feature }: { feature: PickedFeature }) {
 function featureLabel(feature: PickedFeature, index: number): string {
   const p = feature.properties
   for (const key of ['name', 'NAME', 'title', 'TITLE', 'label', 'LABEL']) {
-    if (typeof p[key] === 'string' && p[key]) return p[key] as string
+    if (typeof p[key] === 'string' && p[key]) return p[key]
   }
   return `Feature ${index + 1}`
 }
@@ -130,10 +130,7 @@ export function FeatureDetailSheet({
             </div>
           </ScrollArea>
         ) : (
-          <Tabs
-            defaultValue="0"
-            className="flex flex-col flex-1 min-h-0"
-          >
+          <Tabs defaultValue="0" className="flex flex-col flex-1 min-h-0">
             <TabsList className="mx-5 mt-3 w-fit">
               {features.map((f, i) => (
                 <TabsTrigger key={i} value={String(i)} className="text-[11px]">

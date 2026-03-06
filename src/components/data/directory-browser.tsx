@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react'
-import {
-  FolderIcon,
-  ServerIcon,
-  AlertCircleIcon,
-  PlusIcon,
-} from 'lucide-react'
+import { AlertCircleIcon, FolderIcon, PlusIcon, ServerIcon } from 'lucide-react'
+import { AddServiceDialog } from './add-service-dialog'
+import type {DataSource, DirectoryFolder, DirectoryListing, DirectoryService} from '@/lib/data-sources';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -19,20 +16,19 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import {
-  fetchDirectory,
-  type DataSource,
-  type DirectoryFolder,
-  type DirectoryListing,
-  type DirectoryService,
+  
+  
+  
+  
+  fetchDirectory
 } from '@/lib/data-sources'
-import { AddServiceDialog } from './add-service-dialog'
 
 interface DirectoryBrowserProps {
   source: DataSource
 }
 
 export function DirectoryBrowser({ source }: DirectoryBrowserProps) {
-  const [folderPath, setFolderPath] = useState<string[]>([])
+  const [folderPath, setFolderPath] = useState<Array<string>>([])
   const [listing, setListing] = useState<DirectoryListing | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -97,10 +93,7 @@ export function DirectoryBrowser({ source }: DirectoryBrowserProps) {
               {i < folderPath.length - 1 ? (
                 <BreadcrumbLink
                   render={
-                    <button
-                      type="button"
-                      onClick={() => navigateTo(i + 1)}
-                    />
+                    <button type="button" onClick={() => navigateTo(i + 1)} />
                   }
                 >
                   {segment}
@@ -183,12 +176,11 @@ export function DirectoryBrowser({ source }: DirectoryBrowserProps) {
                 )}
               </div>
             ))}
-            {listing.folders.length === 0 &&
-              listing.services.length === 0 && (
-                <div className="py-8 text-center text-xs text-muted-foreground">
-                  This folder is empty.
-                </div>
-              )}
+            {listing.folders.length === 0 && listing.services.length === 0 && (
+              <div className="py-8 text-center text-xs text-muted-foreground">
+                This folder is empty.
+              </div>
+            )}
           </div>
         </ScrollArea>
       )}

@@ -6,9 +6,7 @@ type LayerInput = Parameters<
 >[0]
 
 /** Map catalog serviceType → engine LayerKind. Returns null if unsupported. */
-export function catalogTypeToLayerKind(
-  serviceType: string,
-): LayerKind | null {
+export function catalogTypeToLayerKind(serviceType: string): LayerKind | null {
   switch (serviceType) {
     case 'arcgis-mapserver':
       return 'arcgis-mapserver'

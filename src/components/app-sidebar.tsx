@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Link, useLocation } from '@tanstack/react-router'
-import { Map, Database } from 'lucide-react'
+import { Database, Map } from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,

@@ -15,7 +15,7 @@ class DataSourceDatabase extends Dexie {
 
 const db = new DataSourceDatabase()
 
-export async function getAllSources(): Promise<DataSource[]> {
+export async function getAllSources(): Promise<Array<DataSource>> {
   return db.sources.orderBy('createdAt').toArray()
 }
 

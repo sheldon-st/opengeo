@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { PlusIcon, Trash2Icon, ServerIcon } from 'lucide-react'
+import { PlusIcon, ServerIcon, Trash2Icon } from 'lucide-react'
+import type {DataSource} from '@/lib/data-sources';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { useDataSourceStore, type DataSource } from '@/lib/data-sources'
+import {  useDataSourceStore } from '@/lib/data-sources'
 
 function deriveLabelFromUrl(url: string): string {
   const cleaned = url.replace(/\/+$/, '')

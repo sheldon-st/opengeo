@@ -1,5 +1,10 @@
 import { useState } from 'react'
 import { SourceFields } from '../layer-detail/source-fields'
+import {
+  ArcGisFeatureServerWizard
+  
+} from './arcgis-featureserver-wizard'
+import type {WizardCompletePayload} from './arcgis-featureserver-wizard';
 import type { GroupLayer, LayerKind } from '@/map-engine/types/layer.types'
 import {
   Dialog,
@@ -22,10 +27,6 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useMapEngine } from '@/map-engine'
-import {
-  ArcGisFeatureServerWizard,
-  type WizardCompletePayload,
-} from './arcgis-featureserver-wizard'
 
 interface AddLayerDialogProps {
   open: boolean

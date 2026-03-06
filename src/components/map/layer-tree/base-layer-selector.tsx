@@ -1,6 +1,6 @@
+import type { BaseLayerPresetId } from '@/map-engine/presets/base-layers'
 import { cn } from '@/lib/utils'
 import { useBaseLayer } from '@/map-engine/hooks/use-base-layer'
-import type { BaseLayerPresetId } from '@/map-engine/presets/base-layers'
 
 export function BaseLayerSelector() {
   const { activePresetId, presets, setPreset } = useBaseLayer()

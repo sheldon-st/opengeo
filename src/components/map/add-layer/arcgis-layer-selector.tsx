@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { AlertCircleIcon } from 'lucide-react'
+import type { ArcGisFeatureServerSourceConfig } from '@/map-engine/types/source.types'
+import type {ArcGisLayerInfo, ArcGisLayerSummary, ArcGisServiceInfo} from '@/lib/arcgis-rest';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -9,14 +11,13 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import {
+  
+  
+  
   fetchFeatureServerInfo,
   fetchLayerInfo,
-  normalizeFeatureServerUrl,
-  type ArcGisLayerInfo,
-  type ArcGisLayerSummary,
-  type ArcGisServiceInfo,
+  normalizeFeatureServerUrl
 } from '@/lib/arcgis-rest'
-import type { ArcGisFeatureServerSourceConfig } from '@/map-engine/types/source.types'
 
 const GEOMETRY_LABELS: Record<string, string> = {
   esriGeometryPoint: 'Point',
@@ -36,7 +37,7 @@ export interface LayerSelectorPayload {
 export interface LayerSelectorCompletePayload {
   groupName: string
   serviceUrl: string
-  layers: LayerSelectorPayload[]
+  layers: Array<LayerSelectorPayload>
 }
 
 function ErrorBanner({ message }: { message: string }) {
@@ -53,7 +54,9 @@ function extractServiceName(url: string): string {
   if (match?.[1]) return match[1]
   const parts = url.split('/').filter(Boolean)
   const fsIdx = parts.findIndex((p) => /featureserver/i.test(p))
-  return (fsIdx > 0 ? parts[fsIdx - 1] : parts[parts.length - 1]) ?? 'FeatureServer'
+  return (
+    (fsIdx > 0 ? parts[fsIdx - 1] : parts[parts.length - 1]) ?? 'FeatureServer'
+  )
 }
 
 interface ArcGisLayerSelectorProps {
@@ -86,7 +89,8 @@ export function ArcGisLayerSelector({
       .then((info) => {
         if (cancelled) return
         const feats = info.layers.filter((l) => l.type === 'Feature Layer')
-        if (!feats.length) throw new Error('No feature layers found in this service')
+        if (!feats.length)
+          throw new Error('No feature layers found in this service')
         const normalized = normalizeFeatureServerUrl(serviceUrl)
         setServiceInfo({ ...info, layers: feats })
         setNormalizedUrl(normalized)
@@ -94,7 +98,10 @@ export function ArcGisLayerSelector({
         setSelectedIds(new Set(feats.map((l) => l.id)))
       })
       .catch((e) => {
-        if (!cancelled) setLoadError(e instanceof Error ? e.message : 'Failed to load service')
+        if (!cancelled)
+          setLoadError(
+            e instanceof Error ? e.message : 'Failed to load service',
+          )
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
@@ -105,9 +112,10 @@ export function ArcGisLayerSelector({
     }
   }, [serviceUrl, token])
 
-  const featureLayers: ArcGisLayerSummary[] = serviceInfo?.layers ?? []
+  const featureLayers: Array<ArcGisLayerSummary> = serviceInfo?.layers ?? []
   const allSelected =
-    featureLayers.length > 0 && featureLayers.every((l) => selectedIds.has(l.id))
+    featureLayers.length > 0 &&
+    featureLayers.every((l) => selectedIds.has(l.id))
 
   const toggleLayer = (id: number) => {
     setSelectedIds((prev) => {
@@ -130,7 +138,7 @@ export function ArcGisLayerSelector({
     setAddError(null)
     try {
       const toAdd = featureLayers.filter((l) => selectedIds.has(l.id))
-      const infos: ArcGisLayerInfo[] = await Promise.all(
+      const infos: Array<ArcGisLayerInfo> = await Promise.all(
         toAdd.map((l) => fetchLayerInfo(normalizedUrl, l.id, token)),
       )
       onComplete({
@@ -149,6 +157,8 @@ export function ArcGisLayerSelector({
             arcgisFields: info.fields,
             arcgisGeometryType: info.geometryType,
             arcgisDrawingInfo: info.drawingInfo ?? null,
+            arcgisTypeIdField: info.typeIdField ?? null,
+            arcgisTypes: info.types ?? null,
             arcgisServiceUrl: normalizedUrl,
             arcgisLayerId: toAdd[i].id,
             arcgisMaxRecordCount: info.maxRecordCount,
@@ -229,7 +239,10 @@ export function ArcGisLayerSelector({
         <label className="text-[11px] font-medium text-muted-foreground">
           Group Name
         </label>
-        <Input value={groupName} onChange={(e) => setGroupName(e.target.value)} />
+        <Input
+          value={groupName}
+          onChange={(e) => setGroupName(e.target.value)}
+        />
       </div>
 
       {/* Global where clause */}

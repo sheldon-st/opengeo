@@ -1,22 +1,32 @@
 import { useCallback, useState } from 'react'
-import { X, ChevronRight, Layers } from 'lucide-react'
+import { ChevronRight, Layers, X } from 'lucide-react'
+import { FeatureDetailSheet } from './feature-detail-sheet'
+import type { MapEngineEventMap } from '@/map-engine/types/events.types'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { useMapEvent } from '@/map-engine'
-import { FeatureDetailSheet } from './feature-detail-sheet'
-import type { MapEngineEventMap } from '@/map-engine/types/events.types'
 
 type PickedPayload = MapEngineEventMap['feature:picked']
 type PickedFeature = PickedPayload['features'][number]
 
 const PREVIEW_PROPS = 5
 
-function featureDisplayName(properties: Record<string, unknown>): string | null {
-  for (const key of ['name', 'NAME', 'title', 'TITLE', 'label', 'LABEL', 'Name']) {
+function featureDisplayName(
+  properties: Record<string, unknown>,
+): string | null {
+  for (const key of [
+    'name',
+    'NAME',
+    'title',
+    'TITLE',
+    'label',
+    'LABEL',
+    'Name',
+  ]) {
     if (typeof properties[key] === 'string' && properties[key]) {
-      return properties[key] as string
+      return properties[key]
     }
   }
   return null
@@ -61,7 +71,15 @@ export function FeaturePopup({ className }: FeaturePopupProps) {
     .filter(([key]) => {
       if (!displayName) return true
       // skip the key we already show as the title
-      for (const k of ['name', 'NAME', 'title', 'TITLE', 'label', 'LABEL', 'Name']) {
+      for (const k of [
+        'name',
+        'NAME',
+        'title',
+        'TITLE',
+        'label',
+        'LABEL',
+        'Name',
+      ]) {
         if (key === k && primary.properties[k] === displayName) return false
       }
       return true
@@ -85,9 +103,13 @@ export function FeaturePopup({ className }: FeaturePopupProps) {
           <div className="flex items-start justify-between gap-2 px-3 py-2.5 bg-muted/40">
             <div className="min-w-0">
               {displayName ? (
-                <p className="font-medium text-[11px] truncate">{displayName}</p>
+                <p className="font-medium text-[11px] truncate">
+                  {displayName}
+                </p>
               ) : (
-                <p className="font-medium text-[11px] text-muted-foreground">Feature</p>
+                <p className="font-medium text-[11px] text-muted-foreground">
+                  Feature
+                </p>
               )}
               {primary.layerName && (
                 <p className="text-[10px] text-muted-foreground truncate flex items-center gap-1 mt-0.5">
@@ -117,9 +139,16 @@ export function FeaturePopup({ className }: FeaturePopupProps) {
               <Separator />
               <div className="px-3 py-2 grid gap-1.5">
                 {previewEntries.map(([key, value]) => (
-                  <div key={key} className="grid grid-cols-[80px_1fr] gap-2 items-baseline">
-                    <span className="text-[10px] text-muted-foreground truncate">{key}</span>
-                    <span className="text-[10px] truncate">{formatPreviewValue(value)}</span>
+                  <div
+                    key={key}
+                    className="grid grid-cols-[80px_1fr] gap-2 items-baseline"
+                  >
+                    <span className="text-[10px] text-muted-foreground truncate">
+                      {key}
+                    </span>
+                    <span className="text-[10px] truncate">
+                      {formatPreviewValue(value)}
+                    </span>
                   </div>
                 ))}
               </div>

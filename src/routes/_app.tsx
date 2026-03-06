@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { MapProvider } from '@/map-engine'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/app-sidebar'
@@ -24,7 +24,6 @@ function AppLayout() {
       }}
     >
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-
         <SidebarProvider>
           <div className="flex flex-col h-screen w-screen overflow-hidden">
             <AppMenubar />

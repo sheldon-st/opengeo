@@ -44,7 +44,9 @@ export function selectFeaturesByLayerId(
   return Object.values(state.features).filter((f) => f.layerId === layerId)
 }
 
-export function selectVisibleLayers(state: MapStoreState): Array<LayerDefinition> {
+export function selectVisibleLayers(
+  state: MapStoreState,
+): Array<LayerDefinition> {
   return selectLayerList(state).filter((l) => l.visible)
 }
 

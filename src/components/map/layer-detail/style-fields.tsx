@@ -214,7 +214,7 @@ export function StyleFields({ layer, onChange }: StyleFieldsProps) {
               <>
                 <Field label="Property">
                   {layer.kind === 'arcgis-featureserver' &&
-                  (layer as ArcGisFeatureServerLayer).availableLabelFields
+                  (layer).availableLabelFields
                     ?.length ? (
                     <Select
                       value={labelConfig.property}
@@ -225,8 +225,8 @@ export function StyleFields({ layer, onChange }: StyleFieldsProps) {
                       </SelectTrigger>
                       <SelectContent>
                         {(
-                          layer as ArcGisFeatureServerLayer
-                        ).availableLabelFields!.map((f) => (
+                          layer
+                        ).availableLabelFields.map((f) => (
                           <SelectItem key={f.name} value={f.name}>
                             {f.alias && f.alias !== f.name ? f.alias : f.name}
                           </SelectItem>

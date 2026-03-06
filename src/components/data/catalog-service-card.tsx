@@ -1,15 +1,13 @@
-import {
-  LayersIcon,
-  PlusIcon,
-} from 'lucide-react'
+import { LayersIcon, PlusIcon } from 'lucide-react'
+import type {CatalogService} from '@/lib/catalog';
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import {
-  getServiceTypeInfo,
+  
   getHealthColor,
-  isAddableServiceType,
-  type CatalogService,
+  getServiceTypeInfo,
+  isAddableServiceType
 } from '@/lib/catalog'
 
 interface CatalogServiceCardProps {

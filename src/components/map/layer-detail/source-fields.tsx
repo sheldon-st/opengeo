@@ -1,13 +1,13 @@
 import type { LayerDefinition } from '@/map-engine'
+import type { ArcGisField } from '@/lib/arcgis-rest'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
-  isConfigurableField,
   FIELD_TYPE_SHORT,
+  isConfigurableField,
 } from '@/components/map/add-layer/arcgis-featureserver-wizard'
-import type { ArcGisField } from '@/lib/arcgis-rest'
 
 interface SourceFieldsProps {
   layer: LayerDefinition
@@ -159,7 +159,9 @@ export function SourceFields({ layer, onChange }: SourceFieldsProps) {
 
     case 'arcgis-featureserver': {
       const s = layer.source
-      const arcgisFields = layer.metadata?.arcgisFields as ArcGisField[] | undefined
+      const arcgisFields = layer.metadata?.arcgisFields as
+        | Array<ArcGisField>
+        | undefined
       const configurableFields = arcgisFields?.filter(isConfigurableField)
       const currentOutFields = new Set(
         s.outFields?.includes('*') || !s.outFields?.length
@@ -171,7 +173,8 @@ export function SourceFields({ layer, onChange }: SourceFieldsProps) {
         const next = new Set(currentOutFields)
         if (next.has(name)) next.delete(name)
         else next.add(name)
-        const allSelected = configurableFields?.every((f) => next.has(f.name)) ?? false
+        const allSelected =
+          configurableFields?.every((f) => next.has(f.name)) ?? false
         update('outFields', allSelected ? ['*'] : Array.from(next))
       }
 

@@ -110,20 +110,26 @@ const DEFAULT_TYPE_INFO: ServiceTypeInfo = {
 }
 
 export function getServiceTypeInfo(serviceType: string): ServiceTypeInfo {
-  return SERVICE_TYPE_MAP[serviceType] ?? {
-    ...DEFAULT_TYPE_INFO,
-    label: serviceType,
-  }
+  return (
+    SERVICE_TYPE_MAP[serviceType] ?? {
+      ...DEFAULT_TYPE_INFO,
+      label: serviceType,
+    }
+  )
 }
 
-export function getHealthColor(
-  status: string | null,
-): { dot: string; text: string } {
+export function getHealthColor(status: string | null): {
+  dot: string
+  text: string
+} {
   switch (status) {
     case 'healthy':
       return { dot: 'bg-green-500', text: 'text-green-600 dark:text-green-400' }
     case 'degraded':
-      return { dot: 'bg-yellow-500', text: 'text-yellow-600 dark:text-yellow-400' }
+      return {
+        dot: 'bg-yellow-500',
+        text: 'text-yellow-600 dark:text-yellow-400',
+      }
     case 'offline':
       return { dot: 'bg-red-500', text: 'text-red-600 dark:text-red-400' }
     default:

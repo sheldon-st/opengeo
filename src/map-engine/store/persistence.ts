@@ -1,5 +1,5 @@
 import Dexie from 'dexie'
-import type {Table} from 'dexie';
+import type { Table } from 'dexie'
 import type { LayerDefinition } from '../types/layer.types'
 import type { FeatureDefinition } from '../types/feature.types'
 import type { MapViewState } from '../types/map.types'

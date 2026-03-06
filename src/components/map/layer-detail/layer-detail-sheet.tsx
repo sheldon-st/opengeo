@@ -2,6 +2,7 @@ import { useCallback } from 'react'
 import { getKindLabel } from '../layer-tree/layer-icon'
 import { SourceFields } from './source-fields'
 import { StyleFields } from './style-fields'
+import { FilterEditor } from './filter-editor/filter-editor'
 import {
   Sheet,
   SheetContent,
@@ -17,6 +18,7 @@ import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { useLayer, useMapEngine } from '@/map-engine'
+import { supportsFiltering } from '@/map-engine/filter'
 
 interface LayerDetailSheetProps {
   layerId: string | null
@@ -60,6 +62,7 @@ function DetailContent({ layerId }: { layerId: string }) {
     'arcgis-featureserver',
     'vector-tile',
   ].includes(layer.kind)
+  const hasFilter = supportsFiltering(layer)
 
   return (
     <Tabs defaultValue="general" className="flex-1 overflow-hidden">
@@ -68,6 +71,7 @@ function DetailContent({ layerId }: { layerId: string }) {
         {layer.kind !== 'group' && (
           <TabsTrigger value="source">Source</TabsTrigger>
         )}
+        {hasFilter && <TabsTrigger value="filter">Filter</TabsTrigger>}
         {isVector && <TabsTrigger value="style">Style</TabsTrigger>}
       </TabsList>
 
@@ -154,6 +158,15 @@ function DetailContent({ layerId }: { layerId: string }) {
           </TabsContent>
         )}
 
+        {hasFilter && (
+          <TabsContent value="filter" className="p-4">
+            <FilterEditor
+              layer={layer}
+              onChange={(filter) => update({ filter })}
+            />
+          </TabsContent>
+        )}
+
         {isVector && (
           <TabsContent value="style" className="p-4">
             <StyleFields layer={layer} onChange={update} />
@@ -171,7 +184,7 @@ export function LayerDetailSheet({
 }: LayerDetailSheetProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="flex flex-col p-0">
+      <SheetContent side="right" className="flex flex-col p-0 ">
         <SheetHeader className="px-4 pt-4 pb-0">
           <SheetTitle>Layer Properties</SheetTitle>
           <SheetDescription>

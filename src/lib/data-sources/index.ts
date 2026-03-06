@@ -1,3 +1,6 @@
+import { fetchArcGisDirectory } from './arcgis-adapter'
+import type { DataSource, DirectoryListing } from './types'
+
 export type {
   DataSource,
   DataSourceType,
@@ -11,12 +14,9 @@ export type {
 export { useDataSourceStore } from './data-source-store'
 export { fetchArcGisDirectory } from './arcgis-adapter'
 
-import type { DataSource, DirectoryListing } from './types'
-import { fetchArcGisDirectory } from './arcgis-adapter'
-
 export function fetchDirectory(
   source: DataSource,
-  path: string[],
+  path: Array<string>,
 ): Promise<DirectoryListing> {
   switch (source.type) {
     case 'arcgis':
