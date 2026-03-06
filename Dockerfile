@@ -12,6 +12,7 @@ RUN pnpm install --frozen-lockfile
 
 # --- Build ---
 FROM deps AS build
+ARG VITE_CATALOG_API_URL
 COPY . .
 RUN pnpm build
 

@@ -43,6 +43,8 @@ jobs:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            VITE_CATALOG_API_URL=https://api.map.opengeo.space
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
