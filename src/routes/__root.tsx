@@ -15,13 +15,22 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'OpenGeo',
+      },
+      {
+        name: 'description',
+        content:
+          'Open-source geospatial web client for visualizing and managing map layers from WMS, WFS, ArcGIS, and more.',
       },
     ],
     links: [
       {
         rel: 'stylesheet',
         href: appCss,
+      },
+      {
+        rel: 'icon',
+        href: '/favicon.ico',
       },
     ],
   }),
