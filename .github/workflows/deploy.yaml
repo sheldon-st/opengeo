@@ -1,8 +1,12 @@
-name: Build & Deploy
+name: Build & Deploy Frontend
 
 on:
   push:
     branches: [main]
+
+concurrency:
+  group: deploy-vps
+  cancel-in-progress: false
 
 env:
   IMAGE_NAME: ghcr.io/${{ github.repository }}
@@ -73,14 +77,19 @@ jobs:
           script: |
             export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
-            # Ensure GHCR image pull secret exists
+            # Ensure namespace exists
+            kubectl create namespace opengeo --dry-run=client -o yaml | kubectl apply -f -
+
+            # Ensure GHCR image pull secret exists in the opengeo namespace
             kubectl create secret docker-registry ghcr-credentials \
+              --namespace opengeo \
               --docker-server=ghcr.io \
               --docker-username=${{ github.actor }} \
               --docker-password=${GHCR_TOKEN} \
               --dry-run=client -o yaml | kubectl apply -f -
 
             helm upgrade --install opengeo ~/opengeo/helm/opengeo \
+              --namespace opengeo \
               --set image.repository=ghcr.io/${{ github.repository }} \
               --set image.tag=${{ needs.build.outputs.image_tag }} \
               --set imagePullSecrets[0].name=ghcr-credentials \
