@@ -59,7 +59,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           source: helm/opengeo/
-          target: /opt/opengeo/
+          target: ~/opengeo/
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
@@ -78,7 +78,7 @@ jobs:
               --docker-password=${GHCR_TOKEN} \
               --dry-run=client -o yaml | kubectl apply -f -
 
-            helm upgrade --install opengeo /opt/opengeo/helm/opengeo \
+            helm upgrade --install opengeo ~/opengeo/helm/opengeo \
               --set image.repository=ghcr.io/${{ github.repository }} \
               --set image.tag=${{ needs.build.outputs.image_tag }} \
               --set imagePullSecrets[0].name=ghcr-credentials \
