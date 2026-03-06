@@ -57,7 +57,10 @@ export function LayerPanel() {
 
       {/* Tree */}
       <div className="flex-1 overflow-hidden p-1">
-        <LayerTree onShowProperties={handleShowProperties} />
+        <LayerTree
+          onShowProperties={handleShowProperties}
+          onAddLayer={() => setAddDialogOpen(true)}
+        />
       </div>
 
       {/* Detail Sheet */}

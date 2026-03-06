@@ -1,6 +1,7 @@
 import { createStore } from 'zustand/vanilla'
 import { subscribeWithSelector } from 'zustand/middleware'
 import * as persistence from './persistence'
+import { BASE_LAYER_PRESETS } from '../presets/base-layers'
 import type { LayerDefinition } from '../types/layer.types'
 import type { FeatureDefinition } from '../types/feature.types'
 import type { MapViewState } from '../types/map.types'
@@ -52,7 +53,7 @@ export function createMapStore(initialView?: Partial<MapViewState>) {
       features: {},
       view: { ...DEFAULT_VIEW, ...initialView },
       selectedFeatureIds: [],
-      baseLayer: null,
+      baseLayer: BASE_LAYER_PRESETS.find((p) => p.id === 'carto-dark')!.createLayer(),
       isHydrated: false,
       isLoading: false,
 
@@ -170,7 +171,7 @@ export function createMapStore(initialView?: Partial<MapViewState>) {
             features,
             view: data.mapState?.view ?? get().view,
             selectedFeatureIds: data.mapState?.selectedFeatureIds ?? [],
-            baseLayer: data.mapState?.baseLayer ?? null,
+            baseLayer: data.mapState?.baseLayer ?? get().baseLayer,
             isHydrated: true,
             isLoading: false,
           })

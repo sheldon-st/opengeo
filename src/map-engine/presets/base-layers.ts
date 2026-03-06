@@ -12,6 +12,8 @@ export interface BaseLayerPreset {
   id: BaseLayerPresetId
   label: string
   color: string
+  /** A representative tile URL used as a thumbnail preview */
+  preview: string
   createLayer: () => XyzTileLayer
 }
 
@@ -47,8 +49,9 @@ function makePreset(
 export const BASE_LAYER_PRESETS: Array<BaseLayerPreset> = [
   {
     id: 'osm',
-    label: 'OpenStreetMap',
+    label: 'Streets',
     color: '#a8d4a8',
+    preview: 'https://tile.openstreetmap.org/3/4/2.png',
     createLayer: makePreset(
       'osm',
       'OpenStreetMap',
@@ -60,6 +63,7 @@ export const BASE_LAYER_PRESETS: Array<BaseLayerPreset> = [
     id: 'carto-light',
     label: 'Light',
     color: '#f0ede9',
+    preview: 'https://a.basemaps.cartocdn.com/light_all/3/4/2.png',
     createLayer: makePreset(
       'carto-light',
       'CartoDB Positron',
@@ -71,6 +75,7 @@ export const BASE_LAYER_PRESETS: Array<BaseLayerPreset> = [
     id: 'carto-dark',
     label: 'Dark',
     color: '#1a1a2e',
+    preview: 'https://a.basemaps.cartocdn.com/dark_all/3/4/2.png',
     createLayer: makePreset(
       'carto-dark',
       'CartoDB Dark Matter',
@@ -82,6 +87,8 @@ export const BASE_LAYER_PRESETS: Array<BaseLayerPreset> = [
     id: 'esri-satellite',
     label: 'Satellite',
     color: '#4a7c59',
+    preview:
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/3/2/4',
     createLayer: makePreset(
       'esri-satellite',
       'ESRI World Imagery',
@@ -93,6 +100,8 @@ export const BASE_LAYER_PRESETS: Array<BaseLayerPreset> = [
     id: 'esri-topo',
     label: 'Topo',
     color: '#c8b89a',
+    preview:
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/3/2/4',
     createLayer: makePreset(
       'esri-topo',
       'ESRI World Topo',
