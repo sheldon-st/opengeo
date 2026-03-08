@@ -2,6 +2,7 @@ import type {
   ArcGisFeatureServerSourceConfig,
   ArcGisMapServerSourceConfig,
   GeoJsonSourceConfig,
+  StacSourceConfig,
   VectorTileSourceConfig,
   WcsSourceConfig,
   WfsSourceConfig,
@@ -22,6 +23,7 @@ export type LayerKind =
   | 'vector-tile'
   | 'wmts'
   | 'wcs'
+  | 'stac'
   | 'group'
 
 export interface LayerBase {
@@ -150,6 +152,11 @@ export interface WcsLayer extends LayerBase {
   source: WcsSourceConfig
 }
 
+export interface StacLayer extends LayerBase {
+  kind: 'stac'
+  source: StacSourceConfig
+}
+
 export interface GroupLayer extends LayerBase {
   kind: 'group'
   source?: never
@@ -166,6 +173,7 @@ export type LayerDefinition =
   | VectorTileLayer
   | WmtsLayer
   | WcsLayer
+  | StacLayer
   | GroupLayer
 
 export type LayerTree = Array<LayerDefinition>

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { CatalogAddDialog } from './catalog-add-dialog'
 import { BboxPreview } from './bbox-preview'
+import { HtmlDescription } from './html-description'
 import type {CatalogService} from '@/lib/catalog';
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -246,9 +247,10 @@ export function CatalogServiceDetail({
                     <span className="text-[10px] font-medium text-muted-foreground">
                       Description
                     </span>
-                    <p className="text-xs leading-relaxed text-foreground/80">
-                      {service.description}
-                    </p>
+                    <HtmlDescription
+                      html={service.description}
+                      className="text-xs leading-relaxed text-foreground/80"
+                    />
                   </div>
                 )}
 

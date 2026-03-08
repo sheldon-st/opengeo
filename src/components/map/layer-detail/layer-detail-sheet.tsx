@@ -65,8 +65,8 @@ function DetailContent({ layerId }: { layerId: string }) {
   const hasFilter = supportsFiltering(layer)
 
   return (
-    <Tabs defaultValue="general" className="flex-1 overflow-hidden">
-      <TabsList variant="line" className="w-full shrink-0">
+    <Tabs defaultValue="general" className="flex-1 overflow-hidden p-2">
+      <TabsList className=" ">
         <TabsTrigger value="general">General</TabsTrigger>
         {layer.kind !== 'group' && (
           <TabsTrigger value="source">Source</TabsTrigger>
@@ -76,7 +76,7 @@ function DetailContent({ layerId }: { layerId: string }) {
       </TabsList>
 
       <ScrollArea className="flex-1">
-        <TabsContent value="general" className="p-4">
+        <TabsContent value="general" className="px-1">
           <div className="grid gap-4">
             <Field label="Name">
               <Input

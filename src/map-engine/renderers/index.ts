@@ -13,6 +13,7 @@ import { xyzTilePredicate, xyzTileRenderer } from './xyz-tile.renderer'
 import { vectorTilePredicate, vectorTileRenderer } from './vector-tile.renderer'
 import { wmtsPredicate, wmtsRenderer } from './wmts.renderer'
 import { wcsPredicate, wcsRenderer } from './wcs.renderer'
+import { stacPredicate, stacRenderer } from './stac.renderer'
 import { groupPredicate, groupRenderer } from './group.renderer'
 import type { LayerRegistry } from '../registry/layer-registry'
 
@@ -46,5 +47,6 @@ export function registerBuiltinRenderers(registry: LayerRegistry): void {
   )
   registry.register('builtin:wmts', wmtsPredicate, wmtsRenderer, 0)
   registry.register('builtin:wcs', wcsPredicate, wcsRenderer, 0)
+  registry.register('builtin:stac', stacPredicate, stacRenderer, 0)
   registry.register('builtin:group', groupPredicate, groupRenderer, 0)
 }

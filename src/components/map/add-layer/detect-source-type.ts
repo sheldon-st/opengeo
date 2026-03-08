@@ -40,6 +40,13 @@ const detectors: SourceDetector[] = [
       /service=wcs/i.test(url) || /\/wcs\b/i.test(url),
   },
   {
+    kind: 'stac',
+    test: (url) =>
+      /\/items\/[^/]+\.json/i.test(url) ||
+      /\/collections\/[^/]+\/items\/[^/]+/i.test(url) ||
+      /stac/i.test(url),
+  },
+  {
     kind: 'geojson',
     test: (url) => /\.geojson(\?|$)/i.test(url) || /\.json(\?|$)/i.test(url),
   },

@@ -75,6 +75,23 @@ export interface WcsSourceConfig {
   bbox?: [number, number, number, number]
 }
 
+export interface StacSourceConfig {
+  /** URL to a STAC entity (Item, Collection, or Catalog). */
+  url: string
+  /** Asset key(s) to render. null = default asset, [] = no assets. */
+  assets?: Array<string> | null
+  /** One-based band indices to display. */
+  bands?: Array<number>
+  /** Show the footprint/bounding box geometry. Default: true. */
+  displayFootprint?: boolean
+  /** Show COG/GeoTIFF overview imagery. Default: true. */
+  displayOverview?: boolean
+  /** Show preview thumbnails (PNG/JPEG). Default: false. */
+  displayPreview?: boolean
+  /** Allow non-COG GeoTIFFs as default imagery. Default: false. */
+  displayGeoTiffByDefault?: boolean
+}
+
 export type SourceConfig =
   | WmsSourceConfig
   | WfsSourceConfig
@@ -85,3 +102,4 @@ export type SourceConfig =
   | VectorTileSourceConfig
   | WmtsSourceConfig
   | WcsSourceConfig
+  | StacSourceConfig

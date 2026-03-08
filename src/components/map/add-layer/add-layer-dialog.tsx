@@ -65,6 +65,7 @@ const KIND_OPTIONS: Array<{
     group: 'Other',
     items: [
       { value: 'arcgis-mapserver', label: 'ArcGIS Map Server' },
+      { value: 'stac', label: 'STAC' },
       { value: 'group', label: 'Group' },
     ],
   },
@@ -103,6 +104,8 @@ function getDefaultSource(
       return { url: '', layer: '', matrixSet: '', format: 'image/png' }
     case 'wcs':
       return { url: '', coverageId: '', version: '2.0.1' }
+    case 'stac':
+      return { url: '' }
     case 'group':
       return undefined
   }

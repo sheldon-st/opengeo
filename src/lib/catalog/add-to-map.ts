@@ -29,6 +29,9 @@ export function catalogTypeToLayerKind(serviceType: string): LayerKind | null {
     case 'tilejson':
     case 'ogc-api-tiles':
       return 'xyz-tile'
+    case 'stac-collection':
+    case 'stac-item':
+      return 'stac'
     default:
       return null
   }
@@ -80,6 +83,9 @@ export function catalogServiceToSourceConfig(
     case 'xyz':
     case 'tilejson':
     case 'ogc-api-tiles':
+      return { url: service.url }
+    case 'stac-collection':
+    case 'stac-item':
       return { url: service.url }
     default:
       return { url: service.url }

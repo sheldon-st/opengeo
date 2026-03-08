@@ -423,6 +423,20 @@ export function SourceFields({ layer, onChange }: SourceFieldsProps) {
       )
     }
 
+    case 'stac': {
+      const s = layer.source
+      return (
+        <div className="grid gap-3">
+          <Field label="URL">
+            <Input
+              defaultValue={s.url}
+              onBlur={(e) => update('url', e.target.value)}
+            />
+          </Field>
+        </div>
+      )
+    }
+
     default:
       return null
   }

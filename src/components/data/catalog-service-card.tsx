@@ -1,10 +1,11 @@
 import { LayersIcon, PlusIcon } from 'lucide-react'
+import { PlainDescription } from './html-description'
 import type {CatalogService} from '@/lib/catalog';
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import {
-  
+
   getHealthColor,
   getServiceTypeInfo,
   isAddableServiceType
@@ -66,9 +67,10 @@ export function CatalogServiceCard({
 
           {/* Description */}
           {service.description && (
-            <p className="mt-0.5 line-clamp-2 text-[11px] leading-relaxed text-muted-foreground">
-              {service.description}
-            </p>
+            <PlainDescription
+              html={service.description}
+              className="mt-0.5 line-clamp-2 text-[11px] leading-relaxed text-muted-foreground"
+            />
           )}
 
           {/* Meta row */}

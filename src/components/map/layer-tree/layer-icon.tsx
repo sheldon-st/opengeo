@@ -27,6 +27,7 @@ const iconMap: Record<
   'vector-tile': Layers,
   wmts: Globe,
   wcs: Scan,
+  stac: Layers,
   group: Folder,
 }
 
@@ -57,6 +58,7 @@ const kindLabels: Record<LayerKind, string> = {
   'vector-tile': 'Vector Tiles',
   wmts: 'WMTS',
   wcs: 'WCS',
+  stac: 'STAC',
   group: 'Group',
 }
 
